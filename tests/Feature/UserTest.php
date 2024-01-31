@@ -139,4 +139,68 @@ class UserTest extends TestCase
                 ]
             ]);
     }
+
+    public function test_update_password_succes()
+    {
+        $this->seed([UserSeeder::class]);
+        $user_old = User::where("username", "test")->first();
+
+        $this->patch(
+            "/api/users/current",
+            [
+                "password" => "password"
+            ],
+            ["Authorization" => "test"]
+        )->assertStatus(200)
+            ->assertJson([
+                "data" => [
+                    "username" => "test",
+                    "name" => "test"
+                ]
+            ]);
+
+        $user_new = User::where("username", "test")->first();
+        self::assertNotEquals($user_old->password, $user_new->password);
+    }
+
+    public function test_update_name_succes()
+    {
+        $this->seed([UserSeeder::class]);
+        $user_old = User::where("username", "test")->first();
+
+        $this->patch(
+            "/api/users/current",
+            [
+                "name" => "Ganti Nama"
+            ],
+            ["Authorization" => "test"]
+        )->assertStatus(200)
+            ->assertJson([
+                "data" => [
+                    "username" => "test",
+                    "name" => "Ganti Nama"
+                ]
+            ]);
+
+        $user_new = User::where("username", "test")->first();
+        self::assertNotEquals($user_old->name, $user_new->name);
+    }
+
+    public function test_update_failed()
+    {
+        $this->seed([UserSeeder::class]);
+
+        $this->patch(
+            "/api/users/current",
+            ["name" => "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Totam iusto omnis reprehenderit harum excepturi nisi corrupti deserunt ab accusamus, at fuga laudantium voluptate illum quas animi consequatur vero quaerat et qui natus perspiciatis voluptatum eligendi. Ex praesentium minima perferendis laudantium fuga, nemo repudiandae corrupti, vel cum veniam incidunt dolores ratione dolorum et nihil ullam qui iure dicta tempora necessitatibus facere. Similique voluptas quaerat labore ad, quam sunt repellendus accusamus doloremque ullam quisquam, voluptates possimus commodi iure facilis nisi et perspiciatis quae qui alias. Aliquid quibusdam natus qui eaque blanditiis inventore nisi. Quibusdam tempora recusandae deserunt totam eos vitae dolorem saepe! ccc"],
+            ["Authorization" => "test"]
+        )->assertStatus(400)
+            ->assertJson([
+                "errors" => [
+                    "name" => [
+                        "The name field must not be greater than 100 characters."
+                    ]
+                ]
+            ]);
+    }
 }
