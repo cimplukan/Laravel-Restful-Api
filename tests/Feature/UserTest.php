@@ -203,4 +203,35 @@ class UserTest extends TestCase
                 ]
             ]);
     }
+
+    public function test_logout_success()
+    {
+        $this->seed([UserSeeder::class]);
+
+        $this->delete("/api/users/logout", [], [
+            "Authorization" => "test"
+        ])->assertStatus(200)
+            ->assertJson([
+                "data" => true
+            ]);
+
+        $user = User::where("username", "test")->first();
+        self::assertNull($user->token);
+    }
+
+    public function test_logout_failed()
+    {
+        $this->seed([UserSeeder::class]);
+
+        $this->delete("/api/users/logout", [], [
+            "Authorization" => "salah"
+        ])->assertStatus(401)
+            ->assertJson([
+                "errors" => [
+                    "message" => [
+                        "Unauthorized"
+                    ]
+                ]
+            ]);
+    }
 }
