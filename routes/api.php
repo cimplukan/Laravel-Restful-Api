@@ -30,5 +30,6 @@ Route::middleware(ApiAuthMiddleware::class)->group(function () {
     Route::delete("/users/logout", [UserController::class, "logout"]);
 
     /* Contacts */
-    Route::post("contacts/create", [ContactController::class, "create"]);
+    Route::post("/contacts/create", [ContactController::class, "create"]);
+    Route::get("/contacts/{id}", [ContactController::class, "get"]);
 });
