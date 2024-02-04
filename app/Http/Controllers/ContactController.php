@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ContactCreateRequest;
+use App\Http\Requests\ContactUpdateRequest;
 use App\Http\Resources\ContactResourse;
 use App\Models\Contact;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -27,10 +28,9 @@ class ContactController extends Controller
     public function get(int $id): ContactResourse
     {
         $user = Auth::user();
+
         $contact = Contact::where('id', $id)->where('user_id', $user->id)->first();
-
         if (!$contact) {
-
             throw new HttpResponseException(response()->json([
                 'errors' => [
                     'message' => [
@@ -40,5 +40,47 @@ class ContactController extends Controller
             ])->setStatusCode(404));
         }
         return new ContactResourse($contact);
+    }
+
+    public function update(int $id, ContactUpdateRequest $request): ContactResourse
+    {
+        $user = Auth::user();
+
+        $contact = Contact::where('id', $id)->where('user_id', $user->id)->first();
+        if (!$contact) {
+            throw new HttpResponseException(response()->json([
+                'errors' => [
+                    'message' => [
+                        'Not found.'
+                    ]
+                ]
+            ])->setStatusCode(404));
+        }
+
+        $data = $request->validated();
+        $contact->fill($data);
+        $contact->save();
+
+        return new ContactResourse($contact);
+    }
+
+    public function delete(int $id): JsonResponse
+    {
+        $user = Auth::user();
+        $contact = Contact::where('id', $id)->where('user_id', $user->id)->first();
+        if (!$contact) {
+            throw new HttpResponseException(response()->json([
+                'errors' => [
+                    'message' => [
+                        'Not found.'
+                    ]
+                ]
+            ])->setStatusCode(404));
+        }
+
+        $contact->delete();
+        return response()->json([
+            'data' => true
+        ])->setStatusCode(200);
     }
 }
