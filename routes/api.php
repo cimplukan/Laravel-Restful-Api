@@ -38,4 +38,5 @@ Route::middleware(ApiAuthMiddleware::class)->group(function () {
     Route::delete("/contacts/{id}", [ContactController::class, "delete"]);
 
     Route::post("/contacts/{id_contact}/addresses", [AddressController::class, 'create']);
+    Route::get("/contacts/{id_contact}/addresses/{id_address}", [AddressController::class, 'get']);
 });
